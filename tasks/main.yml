@@ -1,0 +1,27 @@
+---
+    - name: Getting servers public ip's
+      command: curl ifconfig.com
+      register: serverip
+
+    - set_fact: serverip="{{serverip}}"
+
+    - name: Installing httpd on all servers
+      yum:
+        name: httpd
+        state: latest
+
+    - name: Enabling httpd server
+      systemd:
+        name: httpd
+        enabled: yes
+
+    - name: Modifying html file in httpd
+      template: src=index.html dest=/var/www/html/
+      notify: httpd restart
+
+    - name: Modifying httpd.conf file
+      replace:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^#ServerName www.example.com'
+        replace: 'ServerName {{serverip}}'
+      notify: httpd restart

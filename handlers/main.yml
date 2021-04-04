@@ -1,0 +1,5 @@
+---
+- name: Working on handlers
+  systemd:
+    name: httpd
+    state: restarted
